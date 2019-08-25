@@ -1,7 +1,9 @@
 import * as Peer from 'simple-peer'
-import * as io from 'socket.io-client'
+import io from 'socket.io-client'
+import { topic } from '../../shared/types'
 
 interface Socket {
+  on: (event: string, callback: (...data: any[]) => void) => void;
   emit: (event: string, ...data: any[]) => void;
 }
 
@@ -12,6 +14,23 @@ if (window.location.hostname === 'localhost') {
 //  window.fetch(`https://${config.app.host}`, { mode: 'no-cors' })
 //    .then(() => run(`wss://${config.app.host}`))
 //    .catch(() => console.error('Signalling server failed to send response'))
+}
+
+function registerHandlers(socket: Socket) {
+  const createButton: HTMLButtonElement | null = document.querySelector('#create')
+  if (!createButton) {
+    throw new Error('cannot find create button')
+  }
+  createButton.onclick = () => createRoom(socket, []).then(console.log)
+}
+
+function createRoom(socket: Socket, topics: topic[]): Promise<string> {
+  socket.emit('create', topics)
+  return new Promise((resolve) => {
+    socket.on('created', (roomID: string) => {
+      resolve(roomID)
+    })
+  })
 }
 
 function run (wsUrl: string) {
@@ -36,6 +55,8 @@ function run (wsUrl: string) {
       }
     })
   })
+
+  registerHandlers(socket)
 }
 
 function getMedia (constraints: any) {
