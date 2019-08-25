@@ -4,7 +4,7 @@
 
 const http = require('http')
 const IO = require('socket.io')
-const wsHandler = require('../ws')
+const { wsInit } = require('../lib')
 
 const port = process.env.PORT || 8080
 const server = http.createServer((_, res) => {
@@ -14,7 +14,7 @@ const server = http.createServer((_, res) => {
 })
 const io = IO(server)
 
-wsHandler(io)
+wsInit(io)
 server.listen(port, () => {
   console.log(`Listening on port ${port}`)
 })
