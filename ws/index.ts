@@ -11,17 +11,19 @@ export function wsInit (io: Namespace) {
   io.on('connection', (socket) => {
     socket.on('create', (topics: topic[]) => {
       const room = new Room(topics, topicCallback)
-      socket.emit('created', room.getIdentifier())
+      const roomID = room.getIdentifier()
+      socket.join(roomID)
+      socket.emit('created', roomID)
     })
 
     socket.on('join', (address) => {
       socket.join(address)
-      socket.to(address).emit('connected', socket.id)
+      socket.to(address).emit('joined', socket.id)
     })
 
     socket.on('leave', (address) => {
       socket.leave(address)
-      socket.to(address).emit('disconnected', socket.id)
+      socket.to(address).emit('left', socket.id)
     })
   })
 }

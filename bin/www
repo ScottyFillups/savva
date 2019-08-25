@@ -4,7 +4,7 @@
 
 const http = require('http')
 const IO = require('socket.io')
-const { wsInit } = require('../lib')
+const { wsInit } = require('../ws')
 
 const port = process.env.PORT || 8080
 const server = http.createServer((_, res) => {
