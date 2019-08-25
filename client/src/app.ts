@@ -1,92 +1,82 @@
-import Peer from 'simple-peer'
+import * as Peer from 'simple-peer'
+import * as io from 'socket.io-client'
 
+interface Socket {
+  emit: (event: string, ...data: any[]) => void;
+}
 
 if (window.location.hostname === 'localhost') {
   run(`ws://${window.location.hostname}:8080`)
 } else {
   // Fetch an opaque response to wake up the dyno
-  window.fetch(`https://${config.app.host}`, { mode: 'no-cors' })
-    .then(() => run(`wss://${config.app.host}`))
-    .catch(() => console.error('Signalling server failed to send response'))
+//  window.fetch(`https://${config.app.host}`, { mode: 'no-cors' })
+//    .then(() => run(`wss://${config.app.host}`))
+//    .catch(() => console.error('Signalling server failed to send response'))
 }
 
-function run (wsUrl) {
-  const client = new Colyseus.Client(wsUrl)
-  const room = client.join('relay')
-  const peers = {}
+function run (wsUrl: string) {
+  const socket = io(wsUrl)
+  const peers: { [id:string]:Promise<Peer.Instance|void>; } = {}
   const mediaPromise = getMedia({
-    video: true,
     audio: true
+  }).catch(() => console.error('failed to get media'))
+
+  socket.on('joined', (socketID: string) => {
+    peers[socketID] = createPeer(socket, socketID, mediaPromise, true)
   })
-    .catch(() => getMedia({ audio: true }))
-    .catch(() => getMedia({ video: true }))
 
-  getMedia({ video: true }).then(appendVideo.bind(null, 'self-video'))
+  socket.on('signalled', (socketID: string, data: any) => {
+    peers[socketID] = createPeer(socket, socketID, mediaPromise, false)
+  })
 
-  room.onMessage.add(message => {
-    if (message.target === room.sessionId) {
-      return
-    }
-
-    switch (message.action) {
-      case 'create':
-        peers[message.target] = createPeer(room, message, mediaPromise, true)
-        break
-      case 'signal':
-        if (!peers[message.target]) {
-          peers[message.target] = createPeer(room, message, mediaPromise, false)
-        }
-        peers[message.target].then(peer => {
-          peer.signal(message.data)
-        })
-        break
-      case 'destroy':
-        peers[message.target].then(peer => {
-          destroyPeer(message, peer)
-        })
-        break
-      default:
-        throw new Error('Invalid action')
-    }
+  socket.on('left', (socketID: string) => {
+    peers[socketID].then((peer) => {
+      if (peer) {
+        destroyPeer(socketID, peer)
+      }
+    })
   })
 }
 
-function getMedia (constraints) {
+function getMedia (constraints: any) {
   return navigator.mediaDevices.getUserMedia(constraints)
 }
 
-function destroyPeer (message, peer) {
-  const video = document.querySelector(`#${message.target}`)
-
-  video.parentNode.removeChild(video)
+function destroyPeer (targetID: string, peer: Peer.Instance) {
+  const audio = document.querySelector(`#${targetID}`)
+  if (audio && audio.parentNode) {
+    audio.parentNode.removeChild(audio)
+  }
   peer.destroy()
 }
 
-function createPeer (room, message, mediaPromise, initiator) {
-  return mediaPromise.then(stream => {
+function createPeer (socket: Socket, targetID: string, mediaPromise: Promise<MediaStream|void>, initiator: boolean) {
+  return mediaPromise.then((stream) => {
+    if (!stream) {
+      return
+    }
     const peer = new Peer({ initiator, stream })
-
     peer.on('signal', data => {
-      room.send({ target: message.target, data })
+      socket.emit('signal', targetID, data)
     })
-    peer.on('stream', appendVideo.bind(null, message.target))
-
+    peer.on('stream', appendAudio.bind(null, targetID))
     return peer
   })
 }
 
-function appendVideo (id, stream) {
-  const video = document.createElement('video')
+function appendAudio (id: string, stream: MediaStream) {
+  const audio = document.createElement('audio')
 
-  document.body.appendChild(video)
-  video.id = id
+  // TODO(scotty): Remove the append, return DOM
+  document.body.appendChild(audio)
+  audio.id = id
   try {
-    video.srcObject = stream
+    audio.srcObject = stream
   } catch (error) {
     console.error(error)
-    video.src = URL.createObjectURL(stream)
+    audio.src = URL.createObjectURL(stream)
   }
-  video.play()
+  audio.play()
 
   return stream
 }
