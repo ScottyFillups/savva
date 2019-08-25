@@ -12,9 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "shortid": "^2.2.14",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
+    "@types/shortid": "0.0.29",
     "@types/socket.io": "^2.1.2",
     "typescript": "^3.5.3"
   }

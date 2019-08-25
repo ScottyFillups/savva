@@ -1,4 +1,9 @@
-export interface Topic {
+export interface topic {
   title: string;
   time: number;
+}
+
+export interface topicState {
+  topic: topic;
+  elapsed: number;
 }
