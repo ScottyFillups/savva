@@ -5,12 +5,18 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel src/index.html --open",
+    "check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "parcel-bundler": "^1.12.3"
+    "@types/socket.io-client": "^1.4.32",
+    "parcel-bundler": "^1.12.3",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "socket.io-client": "^2.2.0"
   }
 }
