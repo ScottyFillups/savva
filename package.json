@@ -1,0 +1,22 @@
+{
+  "name": "savva",
+  "version": "1.0.0",
+  "description": "A super cool website for a super cool dude.",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd server && npm run build",
+    "start": "cd server && npm run start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ScottyFillups/savva.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ScottyFillups/savva/issues"
+  },
+  "homepage": "https://github.com/ScottyFillups/savva#readme"
+}
