@@ -1,24 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { Button, Card, Elevation, Overlay, Classes } from '@blueprintjs/core'
+import { JoinOverlay } from './components/join-overlay'
+import { CreateOverlay } from './components/create-overlay'
+
+import "normalize.css";
+import "@blueprintjs/core/lib/css/blueprint.css";
+import "@blueprintjs/icons/lib/css/blueprint-icons.css";
+
+// import './App.css';
 
 const App: React.FC = () => {
+  const [joinOverlayActive, setJoinOverlay] = useState<boolean>(false)
+  const [createOverlayActive, setCreateOverlay] = useState<boolean>(false)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Overlay isOpen={joinOverlayActive} onClose={() => setJoinOverlay(false)}>
+        <JoinOverlay />
+      </Overlay>
+      <Overlay isOpen={createOverlayActive} onClose={() => setCreateOverlay(false)}>
+        <CreateOverlay onSubmit={console.log} />
+      </Overlay>
+      <Card elevation={Elevation.TWO}>
+        <Button icon="log-in" onClick={() => setJoinOverlay(true)}>Join</Button>
+        <Button icon="add" onClick={() => setCreateOverlay(true)}>Create</Button>
+        <p>yo</p>
+      </Card>
     </div>
   );
 }
