@@ -4,7 +4,7 @@
   "description": "A super cool website for a super cool dude.",
   "main": "index.js",
   "scripts": {
-    "postinstall": "cd server && npm install",
+    "postinstall": "bash deployment/heroku_deploy.sh",
     "start": "cd server && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
