@@ -7,3 +7,7 @@ export interface topicState {
   topic: topic;
   elapsed: number;
 }
+
+export interface baseProps {
+  className?: string;
+}

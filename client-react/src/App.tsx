@@ -24,7 +24,6 @@ const App: React.FC = () => {
       <Card elevation={Elevation.TWO}>
         <Button icon="log-in" onClick={() => setJoinOverlay(true)}>Join</Button>
         <Button icon="add" onClick={() => setCreateOverlay(true)}>Create</Button>
-        <p>yo</p>
       </Card>
     </div>
   );
