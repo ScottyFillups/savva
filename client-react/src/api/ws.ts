@@ -77,7 +77,14 @@ export class SavvaAPI {
     })
 
     this.socket.on('signalled', (socketID: string, data: any) => {
-      this.peers[socketID] = this.createPeer(socketID, false, params.onStream)
+      if (!this.peers[socketID]) {
+        this.peers[socketID] = this.createPeer(socketID, false, params.onStream)
+      }
+      this.peers[socketID].then((peer) => {
+        if (peer) {
+          peer.signal(data)
+        }
+      })
     })
 
     this.socket.on('topic change', (newTopic: topic|null) => {

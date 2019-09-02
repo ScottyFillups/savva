@@ -66,8 +66,16 @@ export class Room extends React.Component<RoomProps, roomState>{
     const { started, streams } = this.state
     return (
       <Card>
-        {(streams.map((stream) => (
-          <audio src={URL.createObjectURL(stream)}></audio>
+        {(streams.map((stream, i) => (
+          <audio
+            key={i}
+            ref={(audio) => {
+              if (audio) {
+                audio.srcObject = stream
+                audio.play()
+              }
+            }}
+          ></audio>
         )))}
         { started ? this.renderStarted() : this.renderInactive() }
       </Card>

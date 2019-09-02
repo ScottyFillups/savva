@@ -1,6 +1,5 @@
 import React  from 'react';
 import { SavvaRouter } from './containers/router'
-import { api } from './api/ws'
 
 import "normalize.css";
 import "@blueprintjs/core/lib/css/blueprint.css";

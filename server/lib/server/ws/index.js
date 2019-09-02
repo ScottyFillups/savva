@@ -3,10 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const room_1 = require("./room");
 function wsInit(io) {
     const roomMapping = {};
+    const socketMapping = {};
     const topicCallback = (topic, roomID) => {
         io.in(roomID).emit('topic change', topic);
     };
     io.on('connection', (socket) => {
+        socketMapping[socket.id] = socket;
         register(socket, 'create', (topics) => {
             const room = new room_1.Room(topics, topicCallback);
             const roomID = room.getIdentifier();
@@ -28,6 +30,12 @@ function wsInit(io) {
             const room = roomMapping[address];
             if (room) {
                 room.start();
+            }
+        });
+        register(socket, 'signal', (targetID, data) => {
+            const target = socketMapping[targetID];
+            if (target) {
+                target.emit('signalled', socket.id, data);
             }
         });
         register(socket, 'leave', (address) => {

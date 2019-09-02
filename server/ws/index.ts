@@ -4,11 +4,14 @@ import { Namespace, Socket } from 'socket.io'
 
 export function wsInit (io: Namespace) {
   const roomMapping: { [key:string]:Room; } = {}
+  const socketMapping: { [key:string]:Socket; } = {}
   const topicCallback = (topic: topic|null, roomID: string) => {
     io.in(roomID).emit('topic change', topic)
   }
 
   io.on('connection', (socket) => {
+    socketMapping[socket.id] = socket
+
     register(socket, 'create', (topics: topic[]) => {
       const room = new Room(topics, topicCallback)
       const roomID = room.getIdentifier()
@@ -31,6 +34,13 @@ export function wsInit (io: Namespace) {
       const room = roomMapping[address]
       if (room) {
         room.start()
+      }
+    })
+
+    register(socket, 'signal', (targetID, data) => {
+      const target = socketMapping[targetID]
+      if (target) {
+        target.emit('signalled', socket.id, data)
       }
     })
 
