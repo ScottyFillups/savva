@@ -20,6 +20,9 @@ function wsInit(io) {
                 socket.emit('snapshot', room.getState());
                 socket.to(address).emit('joined', socket.id);
             }
+            else {
+                socket.emit('snapshot', null);
+            }
         });
         register(socket, 'start', (address) => {
             const room = roomMapping[address];

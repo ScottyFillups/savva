@@ -19,13 +19,14 @@ class Room {
     }
     getState() {
         if (this.index === -1 || !this.prevStartTime) {
-            return null;
+            return { started: false };
         }
         const now = new Date();
         const secondDiff = (now.getTime() - this.prevStartTime.getTime()) / 1000;
         return {
             topic: this.topics[this.index],
-            elapsed: secondDiff
+            elapsed: secondDiff,
+            started: true
         };
     }
     next() {

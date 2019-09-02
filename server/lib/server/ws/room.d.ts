@@ -9,7 +9,7 @@ export declare class Room {
     constructor(topics: topic[], cb: topicCallback);
     start(): void;
     getIdentifier(): string;
-    getState(): topicState | null;
+    getState(): topicState;
     private next;
 }
 export {};

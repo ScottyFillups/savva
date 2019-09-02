@@ -22,6 +22,8 @@ export function wsInit (io: Namespace) {
         socket.join(address)
         socket.emit('snapshot', room.getState())
         socket.to(address).emit('joined', socket.id)
+      } else {
+        socket.emit('snapshot', null)
       }
     })
 

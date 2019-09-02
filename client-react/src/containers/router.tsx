@@ -7,7 +7,7 @@ export function SavvaRouter() {
   return (
     <Router>
       <Route path="/" exact component={Lander} />
-      <Route path="/room/:roomID" exact component={Room} />
+      <Route path="/room/:roomID" component={Room} />
     </Router>
   )
 }

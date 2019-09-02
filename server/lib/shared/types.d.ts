@@ -3,8 +3,9 @@ export interface topic {
     time: number;
 }
 export interface topicState {
-    topic: topic;
-    elapsed: number;
+    started: boolean;
+    topic?: topic;
+    elapsed?: number;
 }
 export interface baseProps {
     className?: string;

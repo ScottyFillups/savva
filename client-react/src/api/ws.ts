@@ -1,6 +1,6 @@
 import * as Peer from 'simple-peer'
 import io from 'socket.io-client'
-import { topic } from '../../../shared/types'
+import { topic, topicState } from '../../../shared/types'
 
 interface Socket {
   on: (event: string, callback: (...data: any[]) => void) => void;
@@ -53,8 +53,17 @@ export class SavvaAPI {
     })
   }
 
-  public joinRoom(roomID: string) {
+  public joinRoom(roomID: string): Promise<topicState> {
     this.socket.emit('join', roomID)
+    return new Promise((resolve) => {
+      this.socket.on('snapshot', (topicState: topicState|null) => {
+        if (topicState) {
+          resolve(topicState)
+        } else {
+          throw new Error('room does not exist')
+        }
+      })
+    })
   }
 
   private registerSocketEventHandlers(params: SavvaParams) {
