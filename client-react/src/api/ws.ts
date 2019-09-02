@@ -1,6 +1,6 @@
 import * as Peer from 'simple-peer'
 import io from 'socket.io-client'
-import { topic, topicState } from '../../../shared/types'
+import { topic, topicState } from '../types'
 
 interface Socket {
   on: (event: string, callback: (...data: any[]) => void) => void;
@@ -13,6 +13,7 @@ function getMedia (constraints: any) {
 
 export interface SavvaParams {
   onStream: (targetID: string, stream: MediaStream) => void;
+  onTopicUpdate: (topic: topic|null) => void;
   onDestroy: (targetID: string) => void;
 }
 
@@ -44,6 +45,10 @@ export class SavvaAPI {
     this.registerSocketEventHandlers(params)
   }
 
+  public start(roomID: string) {
+    this.socket.emit('start', roomID)
+  }
+
   public createRoom(topics: topic[]): Promise<string> {
     this.socket.emit('create', topics)
     return new Promise((resolve) => {
@@ -73,6 +78,10 @@ export class SavvaAPI {
 
     this.socket.on('signalled', (socketID: string, data: any) => {
       this.peers[socketID] = this.createPeer(socketID, false, params.onStream)
+    })
+
+    this.socket.on('topic change', (newTopic: topic|null) => {
+      params.onTopicUpdate(newTopic)
     })
 
     this.socket.on('left', (socketID: string) => {

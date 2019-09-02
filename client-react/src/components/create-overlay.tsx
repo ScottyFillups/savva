@@ -80,7 +80,7 @@ export function CreateOverlay(props: ChangeOverlayProps) {
             if (validationResult.isSuccess) {
               const newTopic: topic = {
                 title: topicTitle,
-                time: topicTime
+                time: topicTime * 60
               }
               setTopics(topics.concat([newTopic]))
               setTopicTime(15)
@@ -96,7 +96,7 @@ export function CreateOverlay(props: ChangeOverlayProps) {
       <div>
         {topics.map((topicValue, i) => (
           <Card key={i}>
-            <Tag>{topicValue.time} minutes</Tag>
+            <Tag>{Math.floor(topicValue.time / 60)} minutes</Tag>
             <H4>{topicValue.title}</H4>
           </Card>
         ))}
