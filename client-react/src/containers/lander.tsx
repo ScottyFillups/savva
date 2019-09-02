@@ -4,6 +4,10 @@ import { JoinOverlay } from '../components/join-overlay'
 import { CreateOverlay } from '../components/create-overlay'
 import { api } from '../api/ws'
 
+function handleCreateRoom(roomID: string) {
+  window.location.href = `/room/${roomID}`
+}
+
 export function Lander() {
   const [joinOverlayActive, setJoinOverlay] = useState<boolean>(false)
   const [createOverlayActive, setCreateOverlay] = useState<boolean>(false)
@@ -13,7 +17,7 @@ export function Lander() {
         <JoinOverlay />
       </Overlay>
       <Overlay isOpen={createOverlayActive} onClose={() => setCreateOverlay(false)}>
-        <CreateOverlay onSubmit={topics => api.createRoom(topics).then(console.log)} />
+        <CreateOverlay onSubmit={topics => api.createRoom(topics).then(handleCreateRoom)} />
       </Overlay>
       <Card elevation={Elevation.TWO}>
         <Button icon="log-in" onClick={() => setJoinOverlay(true)}>Join</Button>

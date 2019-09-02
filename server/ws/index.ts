@@ -1,6 +1,6 @@
 import { Room } from './room'
 import { topic } from '../../shared/types'
-import { Namespace } from 'socket.io'
+import { Namespace, Socket } from 'socket.io'
 
 export function wsInit (io: Namespace) {
   const roomMapping: { [key:string]:Room; } = {}
@@ -9,27 +9,40 @@ export function wsInit (io: Namespace) {
   }
 
   io.on('connection', (socket) => {
-    socket.on('create', (topics: topic[]) => {
-      console.log('create', socket.id)
-
+    register(socket, 'create', (topics: topic[]) => {
       const room = new Room(topics, topicCallback)
       const roomID = room.getIdentifier()
-      socket.join(roomID)
+      roomMapping[roomID] = room
       socket.emit('created', roomID)
     })
 
-    socket.on('join', (address) => {
-      console.log('join', socket.id)
-
-      socket.join(address)
-      socket.to(address).emit('joined', socket.id)
+    register(socket, 'join', (address) => {
+      const room = roomMapping[address]
+      if (room) {
+        socket.join(address)
+        socket.emit('snapshot', room.getState())
+        socket.to(address).emit('joined', socket.id)
+      }
     })
 
-    socket.on('leave', (address) => {
-      console.log('leave', socket.id)
+    register(socket, 'start', (address) => {
+      const room = roomMapping[address]
+      if (room) {
+        room.start()
+      }
+    })
 
+    // TODO(scotty): Add proper clean up
+    register(socket, 'leave', (address) => {
       socket.leave(address)
       socket.to(address).emit('left', socket.id)
     })
+  })
+}
+
+function register(socket: Socket, event: string, cb: (...args: any) => void) {
+  socket.on(event, (...args: any) => {
+    console.log(`${(new Date()).toISOString()} => [${event.toUpperCase()}] ID: ${socket.id}`)
+    cb(...args)
   })
 }

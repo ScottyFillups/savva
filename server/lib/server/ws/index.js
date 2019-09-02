@@ -7,23 +7,36 @@ function wsInit(io) {
         io.in(roomID).emit('topic change', topic);
     };
     io.on('connection', (socket) => {
-        socket.on('create', (topics) => {
-            console.log('create', socket.id);
+        register(socket, 'create', (topics) => {
             const room = new room_1.Room(topics, topicCallback);
             const roomID = room.getIdentifier();
-            socket.join(roomID);
+            roomMapping[roomID] = room;
             socket.emit('created', roomID);
         });
-        socket.on('join', (address) => {
-            console.log('join', socket.id);
-            socket.join(address);
-            socket.to(address).emit('joined', socket.id);
+        register(socket, 'join', (address) => {
+            const room = roomMapping[address];
+            if (room) {
+                socket.join(address);
+                socket.emit('snapshot', room.getState());
+                socket.to(address).emit('joined', socket.id);
+            }
         });
-        socket.on('leave', (address) => {
-            console.log('leave', socket.id);
+        register(socket, 'start', (address) => {
+            const room = roomMapping[address];
+            if (room) {
+                room.start();
+            }
+        });
+        register(socket, 'leave', (address) => {
             socket.leave(address);
             socket.to(address).emit('left', socket.id);
         });
     });
 }
 exports.wsInit = wsInit;
+function register(socket, event, cb) {
+    socket.on(event, (...args) => {
+        console.log(`${(new Date()).toISOString()} => [${event.toUpperCase()}] ID: ${socket.id}`);
+        cb(...args);
+    });
+}
