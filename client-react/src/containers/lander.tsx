@@ -11,7 +11,7 @@ export function Lander(props: RouteComponentProps) {
   return (
     <div>
       <Overlay isOpen={joinOverlayActive} onClose={() => setJoinOverlay(false)}>
-        <JoinOverlay />
+        <JoinOverlay onSubmit={(roomID: string) => props.history.push(`/room/${roomID}`)}/>
       </Overlay>
       <Overlay isOpen={createOverlayActive} onClose={() => setCreateOverlay(false)}>
         <CreateOverlay

@@ -48,19 +48,13 @@ export function CreateOverlay(props: ChangeOverlayProps) {
     <Card className={c('create-overlay', props.className)}>
       <H1>Create a room</H1>
       <FormGroup
-        label="Name"
-        labelFor="name-input"
-      >
-        <InputGroup id="name-input" placeholder="Billy Bob" />
-      </FormGroup>
-      <FormGroup
         label="Add topic"
         labelFor="topic-input"
       >
         <ControlGroup id="topic-input">
           <InputGroup
             value={topicTitle}
-            placeholder="scottyfillups.io/savva?r=PPBqWA9"
+            placeholder="Pickles"
             onChange={(e: any) => {
               setTopicTitle(e.target.value)
             }}
