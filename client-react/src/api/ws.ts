@@ -24,8 +24,8 @@ export class SavvaAPI {
 
   constructor(params: SavvaParams) {
     const baseURL = window.location.hostname === 'localhost'
-      ? process.env.REACT_APP_PROD_BASE_URL
-      : process.env.REACT_APP_DEV_BASE_URL
+      ? process.env.REACT_APP_DEV_BASE_URL
+      : process.env.REACT_APP_PROD_BASE_URL
     this.baseURL = baseURL || ''
     this.mediaPromise = getMedia({ audio: true })
     this.socket = io(this.baseURL)
