@@ -21,8 +21,16 @@ export class SavvaAPI {
   private mediaPromise: Promise<MediaStream|void>
   private socket: Socket
   private peers: { [id:string]:Promise<Peer.Instance|void>; }
+  private static instance: SavvaAPI
 
-  constructor(params: SavvaParams) {
+  public static get Instance() {
+    if (!this.instance) {
+      this.instance = new this()
+    }
+    return this.instance
+  }
+
+  private constructor() {
     const baseURL = window.location.hostname === 'localhost'
       ? process.env.REACT_APP_DEV_BASE_URL
       : process.env.REACT_APP_PROD_BASE_URL
@@ -30,6 +38,9 @@ export class SavvaAPI {
     this.mediaPromise = getMedia({ audio: true })
     this.socket = io(this.baseURL)
     this.peers = {}
+  }
+
+  public initialize(params: SavvaParams) {
     this.registerSocketEventHandlers(params)
   }
 
@@ -85,3 +96,5 @@ export class SavvaAPI {
     })
   }
 }
+
+export const api = SavvaAPI.Instance

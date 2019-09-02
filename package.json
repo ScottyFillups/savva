@@ -18,5 +18,7 @@
   "bugs": {
     "url": "https://github.com/ScottyFillups/savva/issues"
   },
-  "homepage": "https://github.com/ScottyFillups/savva#readme"
+  "homepage": "https://github.com/ScottyFillups/savva#readme",
+  "dependencies": {},
+  "devDependencies": {}
 }
