@@ -3,16 +3,23 @@ import { RouteComponentProps } from 'react-router'
 import { H1, H3, Button, Card } from '@blueprintjs/core'
 import { topic, topicState } from '../types'
 import { api } from '../api/ws'
+import { Speaker } from '../components/speaker'
+import './_room.scss'
 
 export interface RoomProps extends RouteComponentProps<{
   roomID: string
 }> {}
 
+interface Stream {
+  media: MediaStream;
+  id: string;
+}
+
 interface roomState {
   started: boolean,
   topic: topic|null,
   remaining: number,
-  streams: MediaStream[],
+  streams: Stream[],
 }
 
 export class Room extends React.Component<RoomProps, roomState>{
@@ -23,9 +30,14 @@ export class Room extends React.Component<RoomProps, roomState>{
         this.setState({ remaining: remaining - 1 })
       }
     }, 1000)
+    api.getLocalMedia().then((localStream) => {
+      if (localStream) {
+        this.setState({ streams: this.state.streams.concat([{ media: localStream, id: api.getID() }]) })
+      }
+    })
     api.initialize({
       onStream: (targetID: string, stream: MediaStream) => {
-        this.setState({ streams: this.state.streams.concat([stream]) })
+        this.setState({ streams: this.state.streams.concat([{ media: stream, id: targetID }]) })
       },
       onTopicUpdate: (newTopic: topic | null) => {
         this.setState({
@@ -65,19 +77,23 @@ export class Room extends React.Component<RoomProps, roomState>{
   render() {
     const { started, streams } = this.state
     return (
-      <Card>
+      <Card className="room-card">
         {(streams.map((stream, i) => (
-          <audio
-            key={i}
-            ref={(audio) => {
-              if (audio) {
-                audio.srcObject = stream
-                audio.play()
-              }
-            }}
-          ></audio>
+          <Speaker id={stream.id} stream={stream.media}>
+            <audio
+              key={i}
+              ref={(audio) => {
+                if (audio) {
+                  audio.srcObject = stream.media
+                  if (i !== 0) {
+                    audio.play()
+                  }
+                }
+              }}
+            ></audio>
+          </Speaker>
         )))}
-        { started ? this.renderStarted() : this.renderInactive() }
+        {started ? this.renderStarted() : this.renderInactive()}
       </Card>
     )
   }  
@@ -98,7 +114,7 @@ export class Room extends React.Component<RoomProps, roomState>{
 
     return (
       <div>
-        <Button onClick={() => this.handleStart(roomID)}>Start</Button>
+        <Button large={true} onClick={() => this.handleStart(roomID)}>Start</Button>
       </div>
     )
   }

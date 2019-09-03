@@ -5,6 +5,7 @@ import { topic, topicState } from '../types'
 interface Socket {
   on: (event: string, callback: (...data: any[]) => void) => void;
   emit: (event: string, ...data: any[]) => void;
+  id: string;
 }
 
 function getMedia (constraints: any) {
@@ -43,6 +44,14 @@ export class SavvaAPI {
 
   public initialize(params: SavvaParams) {
     this.registerSocketEventHandlers(params)
+  }
+
+  public getLocalMedia() {
+    return this.mediaPromise
+  }
+
+  public getID() {
+    return this.socket.id
   }
 
   public start(roomID: string) {
